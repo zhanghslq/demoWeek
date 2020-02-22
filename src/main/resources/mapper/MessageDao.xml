@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhs.dao.MessageDao">
+
+    <resultMap type="com.zhs.entity.Message" id="MessageMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="seqNumber" column="seq_number" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <collection  property="performers" column="id" javaType="java.util.List" ofType="com.zhs.entity.Performer" select="com.zhs.dao.PerformProgramDao.selectAllByProgramIdNoLimit"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="MessageMap">
+        select
+          id, name, seq_number, create_time, update_time
+        from demo.message
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="MessageMap">
+        select
+          id, name, seq_number, create_time, update_time
+        from demo.message
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="MessageMap">
+        select
+          id, name, seq_number, create_time, update_time
+        from demo.message
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="seqNumber != null">
+                and seq_number = #{seqNumber}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into demo.message(name, seq_number)
+        values (#{name}, #{seqNumber})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update demo.message
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="seqNumber != null">
+                seq_number = #{seqNumber},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from demo.message where id = #{id}
+    </delete>
+    <select id="queryAllCount" resultType="java.lang.Integer" parameterType="com.zhs.entity.Message">
+        select
+        count(id)
+        from demo.message
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="seqNumber != null">
+                and seq_number = #{seqNumber}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+</mapper>

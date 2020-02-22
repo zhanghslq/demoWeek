@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhs.dao.PerformerDao">
+
+    <resultMap type="com.zhs.entity.Performer" id="PerformerMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <collection  property="messageList" column="id" javaType="java.util.List" ofType="com.zhs.entity.Message" select="com.zhs.dao.PerformProgramDao.selectAllByPerformId"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PerformerMap">
+        select
+          id, name, mobile, create_time, update_time
+        from demo.performer
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PerformerMap">
+        select
+          id, name, mobile, create_time, update_time
+        from demo.performer
+        <where>
+            <if test="performer.id != null">
+                and id = #{performer.id}
+            </if>
+            <if test="performer.name != null and performer.name != ''">
+                and name like concat('%', #{performer.name,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="performer.mobile != null and performer.mobile != ''">
+                and mobile = #{performer.mobile}
+            </if>
+            <if test="performer.createTime != null">
+                and create_time = #{performer.createTime}
+            </if>
+            <if test="performer.updateTime != null">
+                and update_time = #{performer.updateTime}
+            </if>
+        </where>
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="PerformerMap">
+        select
+          id, name, mobile, create_time, update_time
+        from demo.performer
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="mobile != null and mobile != ''">
+                and mobile = #{mobile}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into demo.performer(name, mobile)
+        values (#{name}, #{mobile})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update demo.performer
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="mobile != null and mobile != ''">
+                mobile = #{mobile},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from demo.performer where id = #{id}
+    </delete>
+    <select id="queryAllCount" resultType="java.lang.Integer">
+        select
+        count(id)
+        from demo.performer
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="mobile != null and mobile != ''">
+                and mobile = #{mobile}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+    <insert id="batchInsert">
+        insert into performer(name,mobile)values
+        <foreach collection="performers" separator="," item="p">
+            (#{p.name,jdbcType=VARCHAR},#{p.mobile,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

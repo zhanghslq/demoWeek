@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhs.dao.PerformProgramDao">
+
+    <resultMap type="com.zhs.entity.PerformProgram" id="PerformProgramMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="performId" column="perform_id" jdbcType="INTEGER"/>
+        <result property="programId" column="program_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap type="com.zhs.entity.Message" id="MessageMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="seqNumber" column="seq_number" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap type="com.zhs.entity.Performer" id="PerformerMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--查询单个-->
+    <select id="queryById" resultMap="PerformProgramMap">
+        select
+          id, perform_id, program_id, create_time, update_time
+        from demo.perform_program
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PerformProgramMap">
+        select
+          id, perform_id, program_id, create_time, update_time
+        from demo.perform_program
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="PerformProgramMap">
+        select
+          id, perform_id, program_id, create_time, update_time
+        from demo.perform_program
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="performId != null">
+                and perform_id = #{performId}
+            </if>
+            <if test="programId != null">
+                and program_id = #{programId}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into demo.perform_program(perform_id, program_id)
+        values (#{performId}, #{programId})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update demo.perform_program
+        <set>
+            <if test="performId != null">
+                perform_id = #{performId},
+            </if>
+            <if test="programId != null">
+                program_id = #{programId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from demo.perform_program where id = #{id}
+    </delete>
+    <delete id="deleteByPerformId">
+        delete from perform_program where perform_id = #{perId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByProgramId">
+        delete from perform_program where program_id = #{proId,jdbcType=INTEGER}
+    </delete>
+    <select id="selectAllByPerformId" resultMap="MessageMap">
+        select m.id, m.name, m.seq_number, m.create_time, m.update_time
+        from perform_program pp left join message m on pp.program_id=m.id
+        where pp.perform_id = #{perId,jdbcType=INTEGER}
+    </select>
+    <select id="selectAllByProgramId" resultMap="PerformerMap">
+        select p.id, p.name, p.mobile, p.create_time, p.update_time
+        from perform_program pp left join performer p on pp.perform_id = p.id
+        where pp.program_id = #{proId,jdbcType=INTEGER}
+        limit #{offset}, #{limit}
+    </select>
+    <select id="selectCountByProgramId" resultType="java.lang.Integer">
+        select count(id)
+        from perform_program
+        where program_id = #{proId,jdbcType=INTEGER}
+    </select>
+    <select id="selectByPerIdAndProId" resultMap="PerformProgramMap">
+        select id, perform_id, program_id, create_time, update_time
+        from perform_program
+        where perform_id = #{perId,jdbcType=INTEGER} and program_id = #{proId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByProIdAndPerId">
+        delete from perform_program where program_id =#{proId,jdbcType=INTEGER} and perform_id = #{perId,jdbcType=INTEGER}
+    </delete>
+    <select id="selectAllByProgramIdNoLimit" resultMap="PerformerMap">
+        select p.id, p.name, p.mobile, p.create_time, p.update_time
+        from perform_program pp left join performer p on pp.perform_id = p.id
+        where pp.program_id = #{proId,jdbcType=INTEGER}
+    </select>
+
+</mapper>
